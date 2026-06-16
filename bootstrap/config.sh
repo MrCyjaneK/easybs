@@ -1,0 +1,43 @@
+#!/bin/bash
+
+export ver=20260614T144248Z
+PKGS="gcc"
+PKGS="$PKGS,g++"
+PKGS="$PKGS,make"
+PKGS="$PKGS,cmake"
+PKGS="$PKGS,ninja-build"
+PKGS="$PKGS,git"
+PKGS="$PKGS,patch"
+PKGS="$PKGS,wget"
+PKGS="$PKGS,curl"
+PKGS="$PKGS,xz-utils"
+PKGS="$PKGS,tar"
+PKGS="$PKGS,unzip"
+PKGS="$PKGS,cpio"
+PKGS="$PKGS,perl"
+PKGS="$PKGS,python3"
+PKGS="$PKGS,rsync"
+PKGS="$PKGS,file"
+PKGS="$PKGS,sed"
+PKGS="$PKGS,pkgconf"
+PKGS="$PKGS,7zip"
+PKGS="$PKGS,7zip-standalone"
+PKGS="$PKGS,libssl-dev"
+PKGS="$PKGS,libbz2-dev"
+PKGS="$PKGS,build-essential"
+PKGS="$PKGS,llvm"
+PKGS="$PKGS,clang"
+PKGS="$PKGS,gawk"
+PKGS="$PKGS,bison"
+PKGS="$PKGS,flex"
+PKGS="$PKGS,texinfo"
+PKGS="$PKGS,autoconf"
+PKGS="$PKGS,automake"
+PKGS="$PKGS,libtool"
+PKGS="$PKGS,help2man"
+PKGS="$PKGS,m4"
+export PKGS
+
+export target=dist/$ver/debian-sid.tar.gz
+export mirror=http://snapshot.debian.org/archive/debian/$ver
+export dockertag="debian:easybs-$ver"

@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1
+
+FROM debian:easybs-20260614T144248Z AS base
+ENV EASYBS_FLAVOR=clang21-aarch64-linux-gnu
+WORKDIR /w
+RUN apt-get -o Acquire::Check-Valid-Until=false update \
+    && apt-get install -y --no-install-recommends \
+    autoconf automake bash bison ca-certificates cmake curl file flex g++ gawk \
+    gettext help2man libgmp-dev libmpc-dev libmpfr-dev libncurses-dev libtool libtool-bin m4 make \
+    ninja-build patch perl python3 rsync sed texinfo unzip xz-utils \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+COPY build/config.sh build/config.sh
+COPY build/config.*.sh build/
+COPY build/scripts/ build/scripts/
+RUN chmod +x build/scripts/*.sh && test -f build/scripts/setup-wrappers.sh
+
+FROM base AS sources
+COPY build/src/ build/src/
+
+FROM sources AS cross
+RUN --mount=type=cache,target=/w/build/ctng-cache/aarch64-linux-gnu \
+    build/scripts/ctng.sh
+
+FROM cross AS native
+RUN --mount=type=cache,target=/w/build/llvm-build-linux/aarch64-linux-gnu \
+    build/scripts/clang-linux.sh
+RUN build/scripts/dash-linux.sh
+RUN build/scripts/toybox-linux.sh
+RUN build/scripts/package-linux.sh
+
+FROM scratch AS artifact
+COPY --from=native /w/dist/clang21-aarch64-linux-gnu.tar.xz /

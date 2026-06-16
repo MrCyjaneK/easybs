@@ -1,0 +1,36 @@
+# syntax=docker/dockerfile:1
+
+FROM debian:easybs-20260614T144248Z AS base
+WORKDIR /w
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates libxml2-dev zlib1g-dev liblzma-dev \
+    && rm -rf /var/lib/apt/lists/*
+COPY build/config.sh build/config.sh
+COPY build/config.*.sh build/
+COPY build/scripts/ build/scripts/
+COPY build/tools/rcodesign build/tools/rcodesign
+RUN chmod +x build/scripts/*.sh build/tools/rcodesign && test -f build/scripts/setup-wrappers.sh
+
+FROM base AS sources
+COPY build/src/ build/src/
+
+FROM sources AS deps
+RUN build/scripts/deps.sh
+
+FROM deps AS sdk
+COPY external/Xcode_26.1.xip /xip/Xcode_26.1.xip
+RUN build/scripts/sdk.sh /xip/Xcode_26.1.xip
+
+FROM sdk AS cross
+RUN --mount=type=cache,target=/w/build/ccache \
+    build/scripts/osxcross.sh
+
+FROM cross AS native
+RUN --mount=type=cache,target=/w/build/llvm-build-darwin \
+    build/scripts/clang-darwin.sh
+RUN build/scripts/dash-darwin.sh
+RUN build/scripts/toybox-darwin.sh
+RUN build/scripts/package.sh
+
+FROM scratch AS artifact
+COPY --from=native /w/dist/clang21-aarch64-apple-darwin.tar.xz /

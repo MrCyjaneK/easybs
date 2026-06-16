@@ -1,0 +1,10 @@
+/build/prefix
+/build/staging
+/build/cache
+/build/llvm-build-darwin
+/build/llvm-build-linux
+/build/ctng-cache
+/dist/host
+/dist/prefix
+/dist/src
+/dist/staging
