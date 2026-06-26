@@ -53,6 +53,12 @@ if [[ -d "$STAGING/usr" ]]; then
     rm -rf "$STAGING/usr"
 fi
 
+if [[ -e "$STAGING/bin/clang++-${CLANG_VERSION}" ]]; then
+    :
+else
+    ln -sf "clang-${CLANG_VERSION}" "$STAGING/bin/clang++-${CLANG_VERSION}"
+fi
+
 /w/build/scripts/setup-wrappers.sh
 
 file "$STAGING/bin/clang-${CLANG_VERSION}"
