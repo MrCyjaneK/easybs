@@ -5,6 +5,15 @@ cd "$(dirname "$0")/.."
 export EASYBS_ROOT="$PWD"
 source build/config.sh
 
+sha256_check() {
+    local expected=$1 file=$2
+    if command -v sha256sum >/dev/null 2>&1; then
+        echo "$expected  $file" | sha256sum -c -
+    else
+        echo "$expected  $file" | shasum -a 256 -c -
+    fi
+}
+
 FLAVOR="${1:-clang21-aarch64-apple-darwin}"
 
 mkdir -p "$SRC"
@@ -25,7 +34,7 @@ download() {
     if [[ -f "$dest" ]]; then
         echo "$dest exists"
         if [[ "$sha256" != skip ]]; then
-            echo "$sha256  $dest" | sha256sum -c -
+            sha256_check "$sha256" "$dest"
         fi
         return
     fi
@@ -38,7 +47,7 @@ download() {
         sleep $((i * 30))
     done
     if [[ "$sha256" != skip ]]; then
-        echo "$sha256  $dest" | sha256sum -c -
+        sha256_check "$sha256" "$dest"
     fi
 }
 
@@ -89,7 +98,10 @@ fetch_darwin() {
             ;;
     esac
     download "$rcodesign_url" "$rcodesign_sha" "$TOOLS/rcodesign.tar.gz"
-    tar xzf "$TOOLS/rcodesign.tar.gz" -C "$TOOLS" --wildcards '*/rcodesign' --strip-components=1
+    rcodesign_tmp=$(mktemp -d)
+    tar xzf "$TOOLS/rcodesign.tar.gz" -C "$rcodesign_tmp"
+    install -m755 "$rcodesign_tmp"/*/rcodesign "$TOOLS/rcodesign"
+    rm -rf "$rcodesign_tmp"
     chmod +x "$TOOLS/rcodesign"
     rm -f "$TOOLS/rcodesign.tar.gz"
 }

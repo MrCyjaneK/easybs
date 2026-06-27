@@ -20,6 +20,33 @@ fi
 HOST_CC=/usr/bin/gcc
 HOST_CXX=/usr/bin/g++
 HOST_TRIPLE="$($HOST_CC -dumpmachine)"
+
+if [[ "$HOST_TRIPLE" != "$TARGET_TRIPLE" ]]; then
+    for tool in as ld ar ranlib nm strip objcopy objdump g++ gcc cpp; do
+        ln -sf "${TARGET_TRIPLE}-${tool}" "$PREFIX/bin/${tool}"
+    done
+fi
+
+ZLIB_SYSROOT_LIB="$SYSROOT/usr/lib/libz.a"
+if [[ ! -f "$ZLIB_SYSROOT_LIB" ]]; then
+    ZLIB_BUILD="$EASYBS_ROOT/build/zlib-sysroot/${TARGET_TRIPLE}/work"
+    ZLIB_TARBALL="$SRC/ct-ng/tarballs/zlib-1.3.1.tar.xz"
+    rm -rf "$ZLIB_BUILD"
+    mkdir -p "$ZLIB_BUILD"
+    tar xf "$ZLIB_TARBALL" -C "$ZLIB_BUILD" --strip-components=1
+    cd "$ZLIB_BUILD"
+    CC="$CC" \
+        AR="$PREFIX/bin/${TARGET_TRIPLE}-ar" \
+        RANLIB="$PREFIX/bin/${TARGET_TRIPLE}-ranlib" \
+        CFLAGS="$CROSS_CFLAGS -fPIC" \
+        LDFLAGS="$CROSS_LDFLAGS" \
+        ./configure --prefix="$SYSROOT/usr" --static
+    make -j"$JOBS"
+    make install
+fi
+test -f "$SYSROOT/usr/include/zlib.h"
+test -f "$ZLIB_SYSROOT_LIB"
+
 CMAKE_EXTRA=(-DLLVM_ENABLE_WERROR=OFF)
 if [[ "$HOST_TRIPLE" != "$TARGET_TRIPLE" ]]; then
   CROSS_CXXFLAGS="$CROSS_CXXFLAGS -Wno-suggest-override"
@@ -43,10 +70,6 @@ if [[ "$HOST_TRIPLE" != "$TARGET_TRIPLE" ]]; then
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     ninja -C "$HOST_TOOLS_BUILD" -j"$JOBS" llvm-tblgen clang-tblgen
   fi
-
-  for tool in as ld ar ranlib nm strip objcopy objdump g++ gcc cpp; do
-    ln -sf "${TARGET_TRIPLE}-${tool}" "$PREFIX/bin/${tool}"
-  done
 
   sed -i 's/^add_subdirectory(Interpreter)$/# cross-build: add_subdirectory(Interpreter)/' \
     "$SRC/llvm/clang/lib/CMakeLists.txt"
@@ -106,6 +129,9 @@ cmake -G Ninja "$LLVM_SRC" \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_ENABLE_ZLIB=FORCE_ON \
+    -DZLIB_INCLUDE_DIR="$SYSROOT/usr/include" \
+    -DZLIB_LIBRARY="$ZLIB_SYSROOT_LIB" \
     "${CMAKE_EXTRA[@]}"
 
 ninja -j"$NINJA_JOBS" || {

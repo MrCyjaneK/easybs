@@ -36,4 +36,10 @@ export RCODESIGN_PKG_SHA256_aarch64=4af92c87ddf52f5f2d1258a3b4e56c7dcb8f1b2468df
 export RCODESIGN_PKG_URL_x86_64=https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign/${RCODESIGN_VERSION}/apple-codesign-${RCODESIGN_VERSION}-x86_64-unknown-linux-musl.tar.gz
 export RCODESIGN_PKG_SHA256_x86_64=dbe85cedd8ee4217b64e9a0e4c2aef92ab8bcaaa41f20bde99781ff02e600002
 
-export JOBS=$(nproc)
+if command -v nproc >/dev/null 2>&1; then
+    export JOBS="$(nproc)"
+elif command -v getconf >/dev/null 2>&1; then
+    export JOBS="$(getconf _NPROCESSORS_ONLN)"
+else
+    export JOBS=4
+fi
