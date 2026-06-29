@@ -122,9 +122,9 @@ fetch_linux() {
         438fd996826b0c82485a29da03a72d71d6e3541a83ec702df4271f6fe025d24e \
         "$tb/gcc-15.2.0.tar.xz"
     download \
-        http://ftpmirror.gnu.org/gnu/glibc/glibc-2.42.tar.xz \
-        d1775e32e4628e64ef930f435b67bb63af7599acb6be2b335b9f19f16509f17f \
-        "$tb/glibc-2.42.tar.xz"
+        http://ftpmirror.gnu.org/gnu/glibc/glibc-2.41.tar.xz \
+        a5a26b22f545d6b7d7b3dd828e11e428f24f4fac43c934fb071b6a7d0828e901 \
+        "$tb/glibc-2.41.tar.xz"
     download \
         https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.20.17.tar.xz \
         d011245629b980d4c15febf080b54804aaf215167b514a3577feddb2495f8a3e \

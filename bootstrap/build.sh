@@ -16,7 +16,7 @@ mmdebstrap \
     --customize-hook='chroot "$1" git config --global user.name easybs' \
     --customize-hook='chroot "$1" git config --global user.email easybs@mrcyjanek.net' \
     --include=$PKGS \
-    sid \
+    trixie \
     $target \
     $mirror
 

@@ -3,13 +3,6 @@
 FROM debian:easybs-20260614T144248Z AS base
 ENV EASYBS_FLAVOR=clang21-aarch64-linux-gnu
 WORKDIR /w
-RUN apt-get -o Acquire::Check-Valid-Until=false update \
-    && apt-get install -y --no-install-recommends \
-    autoconf automake bash bison ca-certificates cmake curl file flex g++ gawk \
-    gettext help2man libgmp-dev libmpc-dev libmpfr-dev libncurses-dev libtool libtool-bin m4 make \
-    ninja-build patch perl python3 rsync sed texinfo unzip xz-utils \
-    zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
 COPY build/config.sh build/config.sh
 COPY build/config.*.sh build/
 COPY build/scripts/ build/scripts/

@@ -2,9 +2,6 @@
 
 FROM debian:easybs-20260614T144248Z AS base
 WORKDIR /w
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates libxml2-dev zlib1g-dev liblzma-dev \
-    && rm -rf /var/lib/apt/lists/*
 COPY build/config.sh build/config.sh
 COPY build/config.*.sh build/
 COPY build/scripts/ build/scripts/

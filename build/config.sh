@@ -21,7 +21,7 @@ export APPLE_LLVM_URL=https://github.com/apple/llvm-project/archive/refs/heads/s
 export APPLE_LLVM_SHA256=b8e87f026e19259e6eac347746661e11592e0ff8bcdb657e177800223d7438ce
 
 export CROSSTOOL_NG_SHA=620b909cd0713f68084378b63cf61b5232757b90
-export CT_NG_CONFIGS_SHA=50eb4f2cbf22872af991c1db5d11f32b6a398d6b
+export CT_NG_CONFIGS_SHA=3089a8522a284b4c34a57a051a56c5a81084fbf6
 
 export DASH_VERSION=0.5.12
 export DASH_URL=http://deb.debian.org/debian/pool/main/d/dash/dash_${DASH_VERSION}.orig.tar.gz
